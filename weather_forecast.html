@@ -1,155 +1,133 @@
 <!DOCTYPE html>
-
-<html><head>
-        <title>WFC</title>
-        <style>
-            .weather{
-                color:rgb(245, 30, 30);
-                font-family: georgia;
-                font-size: 30px;
-                font-weight: bold;
-                display:inline;
-            }
-            .search-bar{
-                font-size: 15px;
-                display:inline;
-                margin-left: 10px;
-                vertical-align:bottom;
-                max-width: max-content;
-            }
-            .search-button{
-                color:white;
-                border:none;
-                height:25px;
-                width:60px;
-                border-style:solid;
-                background-color: red ;
-                margin-left: 4px;
-                padding: center;
-                cursor:pointer;
-                vertical-align: bottom;
-                display: inline;
-                transition:opacity 0.15;
-            }
-            .search-button:hover{
-                opacity: 0.8;
-            }
-            .details{
-                width:200px;
-                line-height:5px;
-                inline-size:100px;
-              }
-              .row {
-                background-color:#f4ccc0;
-                display: inline-block;
-            }
-            .column {
-                float: left;
-                padding: 5px;
-            }
-            table {
-                border:1px black;
-                border-spacing:2px;
-                width:10px;
-                
-            }
-            th, td {
-                text-align: center;
-                padding: 17px;
-                margin-top: 4px;
-                border: 1px solid black;
-                cursor:pointer;
-                
-            }
-            tr:nth-child(1) {
-                background-color:rgb(124, 119, 119);
-                width: 200px;
-                padding:center;  
-                border: 1px solid black;
-                cursor:pointer;
-                margin-right: 8px;
-                text-align: center;
-                transition:opacity 0.15;
-            }
-            tr:nth-child(1):hover{
+<html>
+<head>
+    <title>Weather Forecast Table</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .weather {
+            color: rgb(245, 30, 30);
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            font-size: 16px;
+            padding: 5px;
+            width: 200px;
+        }
+        .search-button {
+            color: white;
+            background-color: red;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .search-button:hover {
             opacity: 0.8;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            max-width: 1000px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #d9534f;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="weather">
+        Weather Forecast
+    </div>
+    <input class="search-bar" type="text" id="cityInput" placeholder="Enter City">
+    <button class="search-button" onclick="getWeather()">Search</button>
+
+    <div id="error"></div>
+    <div id="weatherInfo">
+    </div>
+
+<script>
+    async function getWeather() {
+        const city = document.getElementById('cityInput').value;
+        const apiKey = '89e343c0709b0432677ad680b2e4986b'; // Replace with your OpenWeatherMap API key
+        const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('City not found');
             }
-            
-            tr:nth-child(2) {
-                background-color: rgb(124, 119, 119);     
-            }
-            tr:nth-child(4) {
-                background-color: #f2f2f2;
-            }
-       </style>
-       </head>
-       <body>
-        <div class="wf">
-        <p class="weather">Weather forecast
-            <input class="search-bar" type="text" placeholder="Enter City">
-            <button class="search-button">search</button>
-        </p>
-        </div>
-        <br>
-        <div class="row">
-        <div class="column">
+            const data = await response.json();
+            document.getElementById('error').innerHTML = "";
+            displayTable(data);
+        } catch (error) {
+            document.getElementById('weatherInfo').innerHTML = "";
+            document.getElementById('error').innerText = `Error: ${error.message}`;
+        }
+    }
+
+    function displayTable(data) {
+        let tableHTML = `
             <table>
-                <tbody><tr style="background-color:red" ;=""><td>Date:DD/MM/YYYY</td></tr>
-                <tr style="background-color:rgb(124, 119, 119)" ;=""><td>Temperature</td></tr>
-            </tbody></table>
-            <div class="details">
-                <table>
-                    <tbody><tr><td><b>min</b></td><td><b>max</b></td></tr>
-                    <tr><td>xx.xx</td><td>xx.xx</td></tr>
-                    <tr><td>Pressure</td><td>xxx.xx</td></tr>
-                    <tr><td>Humidity</td><td>xxx.xx</td></tr>
-                </tbody></table>
-            </div></div>
-        <div class="column">
-            <table>
-                <tbody><tr style="background-color:red" ;=""><td>Date:DD/MM/YYYY</td></tr>
-                <tr style="background-color:rgb(124, 119, 119)" ;=""><td>Temperature</td></tr>
-            </tbody></table>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Temp (°C)</th>
+                    <th>Min Temp (°C)</th>
+                    <th>Max Temp (°C)</th>
+                    <th>Pressure (hPa)</th>
+                    <th>Humidity (%)</th>
+                </tr>
+        `;
 
-        <div class="details">
-            <table>
-                <tbody><tr><td><b>min</b></td><td><b>max</b></td></tr>
-                <tr><td>xx.xx</td><td>xx.xx</td></tr>
-                <tr><td>Pressure</td><td>xxx.xx</td></tr>
-                <tr><td>Humidity</td><td>xxx.xx</td></tr>
-            </tbody></table>
-        </div></div>
-    <div class="column">
-        <table>
-            <tbody><tr style="background-color:red" ;=""><td>Date:DD/MM/YYYY</td></tr>
-            <tr style="background-color:rgb(124, 119, 119)" ;=""><td>Temperature</td></tr>
-        </tbody></table>
+        // Display next 5 forecasts (every 3 hours apart)
+        for (let i = 0; i < 5; i++) {
+            const forecast = data.list[i];
+            const date = new Date(forecast.dt_txt).toLocaleString();
+            const temp = forecast.main.temp.toFixed(1);
+            const tempMin = forecast.main.temp_min.toFixed(1);
+            const tempMax = forecast.main.temp_max.toFixed(1);
+            const pressure = forecast.main.pressure.toFixed(1);
+            const humidity = forecast.main.humidity.toFixed(1);
 
-        <div class="details">
-            <table>
-                <tbody><tr><td><b>min</b></td><td><b>max</b></td></tr>
-                <tr><td>xx.xx</td><td>xx.xx</td></tr>
-                <tr><td>Pressure</td><td>xxx.xx</td></tr>
-                <tr><td>Humidity</td><td>xxx.xx</td></tr>
-            </tbody></table>
-        </div></div>
-    <div class="column">
-        <table>
-            <tbody><tr style="background-color:red" ;=""><td>Date:DD/MM/YYYY</td></tr>
-            <tr style="background-color:rgb(124, 119, 119)" ;=""><td>Temperature</td></tr>
-        </tbody></table>
+            tableHTML += `
+                <tr>
+                    <td>${date}</td>
+                    <td>${temp}</td>
+                    <td>${tempMin}</td>
+                    <td>${tempMax}</td>
+                    <td>${pressure}</td>
+                    <td>${humidity}</td>
+                </tr>
+            `;
+        }
 
-    <div class="details">
-        <table>
-            <tbody><tr><td><b>min</b></td><td><b>max</b></td></tr>
-            <tr><td>xx.xx</td><td>xx.xx</td></tr>
-            <tr><td>Pressure</td><td>xxx.xx</td></tr>
-            <tr><td>Humidity</td><td>xxx.xx</td></tr>
-        </tbody></table>
-    </div></div></div>
-    
+        tableHTML += `</table>`;
+        document.getElementById('weatherInfo').innerHTML = tableHTML;
+    }
+</script>
 
-
-
-
-</body></html>
+</body>
+</html>
